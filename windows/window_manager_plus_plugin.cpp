@@ -1,4 +1,4 @@
-#include "include/window_manager_plus/window_manager_plus_plugin.h"
+﻿#include "include/window_manager_plus/window_manager_plus_plugin.h"
 
 // This must be included before many other Windows headers.
 #include <windows.h>
@@ -455,13 +455,22 @@ void WindowManagerPlusPlugin::HandleMethodCall(
 
   if (method_name.compare("ensureInitialized") == 0) {
     if (windowId >= 0) {
+      // if this method is called when window manager already exists, this may be due to a hot restart in flutter.
+      // Clear the old channel if applicable.
+      auto it = WindowManagerPlus::windowManagers_.find(windowId);
+      if (it != WindowManagerPlus::windowManagers_.end()) {
+        auto existing_manager = it->second;
+        if (existing_manager->channel) {
+          existing_manager->channel->SetMethodCallHandler(nullptr);
+          existing_manager->channel.reset();  // clear old channel
+        }
+      }
+
       window_manager->id = windowId;
       window_manager->native_window =
           ::GetAncestor(registrar->GetView()->GetNativeWindow(), GA_ROOT);
 
-      if (window_manager->channel) {
-        window_manager->channel->SetMethodCallHandler(nullptr);
-      }
+      // create new channel
       window_manager->channel =
           std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
               registrar->messenger(),
