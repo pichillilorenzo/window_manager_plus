@@ -21,22 +21,13 @@
 extern "C" {
 #endif
 
-FLUTTER_PLUGIN_EXPORT void WindowManagerPlusPluginRegisterWithRegistrar(FlutterDesktopPluginRegistrarRef registrar);
-
-#ifndef RUNNER_FLUTTER_WINDOW_H_
-#define RUNNER_FLUTTER_WINDOW_H_
-class FlutterWindow {
- public:
-  virtual void Destroy() = 0;
-};
-
-#endif  // RUNNER_FLUTTER_WINDOW_H_
-
-typedef std::shared_ptr<FlutterWindow> (*WindowManagerPlusPluginWindowCreatedCallback)(std::vector<std::string> command_line_arguments);
-FLUTTER_PLUGIN_EXPORT void WindowManagerPlusPluginSetWindowCreatedCallback(WindowManagerPlusPluginWindowCreatedCallback callback);
+	FLUTTER_PLUGIN_EXPORT void WindowManagerPlusPluginRegisterWithRegistrar(FlutterDesktopPluginRegistrarRef registrar);
 
 #if defined(__cplusplus)
 }  // extern "C"
 #endif
+
+typedef void (*WindowManagerPlusPluginWindowCreatedCallback)(int64_t windowId, std::vector<std::string> command_line_arguments);
+FLUTTER_PLUGIN_EXPORT void WindowManagerPlusPluginSetWindowCreatedCallback(WindowManagerPlusPluginWindowCreatedCallback callback);
 
 #endif  // FLUTTER_PLUGIN_WINDOW_MANAGER_PLUS_PLUGIN_H_
